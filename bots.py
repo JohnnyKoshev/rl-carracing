@@ -25,6 +25,7 @@ def model_policy(observation, model):
 
 def bots_only():
     NUM_CARS = 3
+    car_labels = ["PPO_1M", "PPO_2M", "DQN_1M"]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
@@ -43,17 +44,19 @@ def bots_only():
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_random_direction=True,
                    use_ego_color=True, continuous_actions=[True, True, False],
-                   car_labels=["PPO_1M", "PPO_2M", "DQN_1M"])
+                   car_labels=car_labels)
 
     obs = env.reset()
 
     is_open = True
     stopped = False
+
     while is_open and not stopped:
         obs = env.reset()
         total_reward = np.zeros(NUM_CARS)
         steps = 0
         restart = False
+
         while True:
             actions[0] = model_policy(obs[0], ppo_model_1m)
             actions[1] = model_policy(obs[1], ppo_model_2m)
@@ -61,9 +64,22 @@ def bots_only():
 
             obs, r, done, info = env.step(actions)
             total_reward += r
-            if steps % 200 == 0 or done:
-                print("\nActions: " + str.join(" ", [f"Car {x}: " + str(actions[x]) for x in range(NUM_CARS)]))
+
+            if steps % 200 == 0:
+                print("\n\nStep " + str(steps))
+                for i in range(NUM_CARS):
+                    print(f"{car_labels[i]} action: {actions[i]}")
+
+            if done:
+                print("\n\nDone:")
+                for i in range(NUM_CARS):
+                    print(f"{car_labels[i]} reward: {total_reward[i]}")
                 print(f"Step {steps} Total_reward " + str(total_reward))
+
+                print("The winner by total reward is:", car_labels[np.argmax(total_reward)])
+                stopped = True
+                break
+
             steps += 1
             is_open = env.render().all()
             if stopped or done or restart or is_open == False:

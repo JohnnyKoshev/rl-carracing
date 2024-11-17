@@ -28,6 +28,7 @@ CAR_CONTROL_KEYS = [[key.LEFT, key.RIGHT, key.UP, key.DOWN]]
 
 def player_vs_cars():
     NUM_CARS = 4
+    car_labels = ["Player", "PPO_1M", "PPO_2M", "DQN_1M"]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
@@ -63,7 +64,7 @@ def player_vs_cars():
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_ego_color=True, continuous_actions=[True, True, True, False],
-                   car_labels=["Player", "PPO_1M", "PPO_2M", "DQN_1M"])
+                   car_labels=car_labels)
 
     obs = env.reset()
 
@@ -85,9 +86,22 @@ def player_vs_cars():
 
             obs, r, done, info = env.step(actions)
             total_reward += r
-            if steps % 200 == 0 or done:
-                print("\nActions: " + str.join(" ", [f"Car {x}: " + str(actions[x]) for x in range(NUM_CARS)]))
+
+            if steps % 200 == 0:
+                print("\n\nStep " + str(steps))
+                for i in range(NUM_CARS):
+                    print(f"{car_labels[i]} action: {actions[i]}")
+
+            if done:
+                print("\n\nDone:")
+                for i in range(NUM_CARS):
+                    print(f"{car_labels[i]} reward: {total_reward[i]}")
                 print(f"Step {steps} Total_reward " + str(total_reward))
+
+                print("The winner by total reward is:", car_labels[np.argmax(total_reward)])
+                stopped = True
+                break
+
             steps += 1
             is_open = env.render().all()
             if stopped or done or restart or is_open == False:

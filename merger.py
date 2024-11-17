@@ -347,6 +347,7 @@ class MultiCarRacing(gym.Env, EzPickle):
 
             if any(count >= len(self.track) for count in self.tile_visited_count):
                 done = True
+
         if self.num_agents == 1:
             return self.state, step_reward[0], done, {}
         else:

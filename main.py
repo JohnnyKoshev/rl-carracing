@@ -1,19 +1,12 @@
 import multiprocessing
 import time
-
-import numpy as np
-import gym
 import pygame
-from pyglet.window import key
-from stable_baselines3 import DQN, PPO, SAC
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.env_util import make_vec_env
-
 from player import player_vs_cars
 from bots import bots_only
+import fontTools
 
-def run_with_retries(target, retries=5):
+
+def run_with_retries(target, retries=10):
     attempt = 0
     while attempt < retries:
         process = multiprocessing.Process(target=target)
@@ -30,7 +23,6 @@ def run_with_retries(target, retries=5):
     print("Max retries reached. Exiting.")
 
 
-
 def main_menu():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
@@ -38,7 +30,7 @@ def main_menu():
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)
 
-    menu_items= ["1. Player vs RL Models", "2. RL Models only"]
+    menu_items = ["1. Player vs RL Models", "2. RL Models only"]
     selected_item = 0
 
     while True:
@@ -58,15 +50,20 @@ def main_menu():
                     elif selected_item == 1:
                         run_with_retries(bots_only)
 
-        for i, item in enumerate(menu_items):
-            if i == selected_item:
-                text = font.render(item, True, (255, 0, 0))
-            else:
-                text = font.render(item, True, (255, 255, 255))
-            screen.blit(text, (100, 100 + i * 40))
+            for i, item in enumerate(menu_items):
 
-        pygame.display.flip()
-        clock.tick(30)
+                if i == selected_item:
+                    text = font.render(item, True, (255, 0, 0))
+                else:
+                    text = font.render(item, True, (255, 255, 255))
+                screen.blit(text, (100, 100 + i * 40))
+
+            pygame.display.flip()
+            clock.tick(30)
+
 
 if __name__ == "__main__":
-    main_menu()
+    try:
+        main_menu()
+    except Exception as e:
+        exit(0)
