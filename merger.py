@@ -314,13 +314,11 @@ class MultiCarRacing(gym.Env, EzPickle):
                 # Loop through each agent and apply the correct actions
                 for i, car in enumerate(self.cars):
                     if not self.continuous_actions[i]:  # Discrete action
-                        print(f"DISCRETE ACTION for car {i}: ", action[i])
                         action_i = self.actions[action[i]]  # Select from mapping
                         car.steer(-action_i[0])
                         car.gas(action_i[1])
                         car.brake(action_i[2])
                     else:  # Continuous action
-                        print(f"CONTINUOUS ACTION for car {i}: ", action[i])
                         car.steer(-action[i][0])
                         car.gas(action[i][1])
                         car.brake(action[i][2])

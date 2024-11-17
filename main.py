@@ -1,3 +1,6 @@
+import multiprocessing
+import time
+
 import numpy as np
 import gym
 import pygame
@@ -10,6 +13,23 @@ from stable_baselines3.common.env_util import make_vec_env
 from player import player_vs_cars
 from bots import bots_only
 
+def run_with_retries(target, retries=5):
+    attempt = 0
+    while attempt < retries:
+        process = multiprocessing.Process(target=target)
+        process.start()
+        process.join()
+
+        if process.exitcode == 0:
+            return  # Exit if the process finished successfully
+        else:
+            print(f"Process failed with exit code {process.exitcode}. Retrying... ({attempt + 1}/{retries})")
+            attempt += 1
+            time.sleep(1)  # Add a slight delay before retrying
+
+    print("Max retries reached. Exiting.")
+
+
 
 def main_menu():
     pygame.init()
@@ -18,12 +38,10 @@ def main_menu():
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)
 
-    menu_items= ["1. Player vs 2 cars", "2. Bots only"]
+    menu_items= ["1. Player vs RL Models", "2. RL Models only"]
     selected_item = 0
 
     while True:
-        screen.fill((0, 0, 0))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -34,12 +52,11 @@ def main_menu():
                 elif event.key == pygame.K_DOWN:
                     selected_item = (selected_item + 1) % len(menu_items)
                 elif event.key == pygame.K_RETURN:
+                    pygame.quit()
                     if selected_item == 0:
-                        pygame.quit()
-                        player_vs_cars()
+                        run_with_retries(player_vs_cars)
                     elif selected_item == 1:
-                        pygame.quit()
-                        bots_only()
+                        run_with_retries(bots_only)
 
         for i, item in enumerate(menu_items):
             if i == selected_item:
