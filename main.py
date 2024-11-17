@@ -1,9 +1,14 @@
 import numpy as np
 import gym
+import torch
+from gym.envs.classic_control import rendering
 from pyglet.window import key
 import random
 
 from stable_baselines3 import DQN, PPO, SAC
+
+# Ensure CUDA is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 gym.register(
     id='MultiCarRacing-v0',
@@ -24,7 +29,7 @@ def model_policy(observation, model):
 
 
 if __name__ == "__main__":
-    NUM_CARS = 3
+    NUM_CARS = 2
 
     CAR_CONTROL_KEYS = [[key.LEFT, key.RIGHT, key.UP, key.DOWN]]
 
@@ -32,12 +37,12 @@ if __name__ == "__main__":
     actions = [
         [0.0, 0.0, 0.0],
         0,
-        [0.0, 0.0, 0.0],
+        # [0.0, 0.0, 0.0],
 
     ]
 
-    dqn_model = DQN.load("DQN_RL_1M")
-    ppo_model = PPO.load("PPO_RL_1M")
+    dqn_model = DQN.load("DQN_RL_1M", device=device)
+    ppo_model = PPO.load("PPO_RL_1M", device=device)
 
 
     print("Model loaded")
@@ -62,15 +67,37 @@ if __name__ == "__main__":
         if k == CAR_CONTROL_KEYS[0][3]: actions[0][2] = 0
 
 
+    class DummyViewer(rendering.Viewer):
+        def __init__(self, width, height):
+            self.width = width
+            self.height = height
+            self.window = None
+            self.geoms = []
+            self.onetime_geoms = []
+            self.transform = rendering.Transform()
+
+        def render(self, return_rgb_array=False):
+            if return_rgb_array:
+                return np.zeros((self.height, self.width, 3), dtype=np.uint8)
+            return None
+
+        def close(self):
+            pass
+
+        def isopen(self):
+            return False
+
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_random_direction=True,
-                   use_ego_color=True, continuous_actions=[True, False, True], car_labels=["Johnny", "DQN", "PPO"])
+                   use_ego_color=True, continuous_actions=[True, False], car_labels=["PPO", "DQN"])
 
+    env.viewer[0] = DummyViewer(640, 480)
     obs = env.reset()
 
-    for viewer in env.viewer:
-        viewer.window.on_key_press = key_press
-        viewer.window.on_key_release = key_release
+
+    # for viewer in env.viewer:
+    #     viewer.window.on_key_press = key_press
+    #     viewer.window.on_key_release = key_release
 
     is_open = True
     stopped = False
@@ -80,7 +107,7 @@ if __name__ == "__main__":
         steps = 0
         restart = False
         while True:
-            actions[2] = model_policy(obs[2], ppo_model)
+            actions[0] = model_policy(obs[0], ppo_model)
             actions[1] = model_policy(obs[1], dqn_model)
 
             obs, r, done, info = env.step(actions)
