@@ -3,7 +3,7 @@ import gym
 from pyglet.window import key
 import random
 
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO, SAC
 
 gym.register(
     id='MultiCarRacing-v0',
@@ -11,14 +11,6 @@ gym.register(
     max_episode_steps=1000,
     reward_threshold=900
 )
-
-
-def random_policy(observation):
-    return np.array([random.uniform(-1, 1), random.uniform(0, 1), random.uniform(0, 1)])
-
-
-def discrete_random_policy(observation):
-    return random.randint(0, 4)
 
 
 def model_policy(observation, model):
@@ -32,17 +24,21 @@ def model_policy(observation, model):
 
 
 if __name__ == "__main__":
-    NUM_CARS = 2
+    NUM_CARS = 3
 
     CAR_CONTROL_KEYS = [[key.LEFT, key.RIGHT, key.UP, key.DOWN]]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
         [0.0, 0.0, 0.0],
-        0
+        0,
+        [0.0, 0.0, 0.0],
+
     ]
 
-    model = DQN.load("DQN_RL_100")
+    dqn_model = DQN.load("DQN_RL_1M")
+    ppo_model = PPO.load("PPO_RL_1M")
+
 
     print("Model loaded")
 
@@ -68,7 +64,7 @@ if __name__ == "__main__":
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_random_direction=True,
-                   use_ego_color=True, continuous_actions=[True, False], car_labels=["Johnny", "DQN"])
+                   use_ego_color=True, continuous_actions=[True, False, True], car_labels=["Johnny", "DQN", "PPO"])
 
     obs = env.reset()
 
@@ -84,7 +80,8 @@ if __name__ == "__main__":
         steps = 0
         restart = False
         while True:
-            actions[1] = model_policy(obs[1], model)
+            actions[2] = model_policy(obs[2], ppo_model)
+            actions[1] = model_policy(obs[1], dqn_model)
 
             obs, r, done, info = env.step(actions)
             total_reward += r
