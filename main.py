@@ -40,10 +40,10 @@ def main_menu():
     footer_font = pygame.font.Font(None, 24)
 
     # Load background image
-    background_image = pygame.image.load("background.jpg")  # Replace with your image path
+    background_image = pygame.image.load("menu.png")  # Replace with your image path
     background_image = pygame.transform.scale(background_image, (800, 600))
 
-    title = "Car Racists"
+    title = "Car   Racists"
     footer = "U2110292 Abdulaziz Zakirov, U2110289 Komiljon Yuldashev"
 
     menu_items = ["1. Player vs RL Models", "2. RL Models only"]
@@ -85,11 +85,9 @@ def main_menu():
                     if item_rect.collidepoint(mouse_pos):
                         selected_item = i
 
-        # Render and display the title
         title_text = title_font.render(title, True, (255, 255, 0))
         screen.blit(title_text, (400 - title_text.get_width() // 2, 50))
 
-        # Render and display menu items
         for i, item in enumerate(menu_items):
             if i == selected_item:
                 text = font.render(item, True, (255, 0, 0))
@@ -97,7 +95,12 @@ def main_menu():
                 text = font.render(item, True, (255, 255, 255))
             screen.blit(text, (100, 150 + i * 40))
 
-        # Render and display the footer
+        footer_font = pygame.font.Font(None, 32)
+
+
+        shadow_text = footer_font.render(footer, True, (0, 0, 0))
+        screen.blit(shadow_text, (400 - shadow_text.get_width() // 2 + 3, 550 + 3))
+
         footer_text = footer_font.render(footer, True, (255, 255, 255))
         screen.blit(footer_text, (400 - footer_text.get_width() // 2, 550))
 
@@ -109,5 +112,6 @@ if __name__ == "__main__":
     try:
         main_menu()
     except Exception as e:
+        print(f"An error occurred: {e}")
         pygame.mixer.music.stop()  # Stop music on exit
         exit(0)
