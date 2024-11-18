@@ -25,7 +25,7 @@ def model_policy(observation, model):
 
 def bots_only():
     NUM_CARS = 3
-    car_labels = ["PPO_1M", "PPO_Discrete_1M", "DQN_1M"]
+    car_labels = ["PPO_1M", "PPO_Discrete_2M", "DQN_1M"]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
@@ -35,9 +35,9 @@ def bots_only():
     ]
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    dqn_model = DQN.load("DQN_RL_1M", device=device)
     ppo_model_1m = PPO.load("PPO_RL_1M", device=device)
-    ppo_discrete_model_1m = PPO.load("PPO_Discrete_RL_1M", device=device)
+    dqn_model = DQN.load("DQN_RL_1M", device=device)
+    ppo_discrete_model_1m = PPO.load("PPO_Discrete_RL_2M.zip", device=device)
 
     print("Model loaded")
 

@@ -28,20 +28,20 @@ CAR_CONTROL_KEYS = [[key.LEFT, key.RIGHT, key.UP, key.DOWN]]
 
 def player_vs_cars():
     NUM_CARS = 4
-    car_labels = ["Player", "PPO_1M", "PPO_2M", "DQN_1M"]
+    car_labels = ["Player", "PPO_1M", "PPO_Discrete_2M", "DQN_1M"]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
         [0.0, 0.0, 0.0],
         [0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0],
+        0,
         0,
     ]
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dqn_model = DQN.load("DQN_RL_1M", device=device)
     ppo_model_1m = PPO.load("PPO_RL_1M", device=device)
-    ppo_model_2m = PPO.load("PPO_RL_2M", device=device)
+    ppo_discrete_model_2m = PPO.load("PPO_Discrete_RL_2M.zip", device=device)
 
     print("Model loaded")
 
@@ -63,7 +63,7 @@ def player_vs_cars():
         if k == CAR_CONTROL_KEYS[0][3]: actions[0][2] = 0
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
-                   use_ego_color=True, continuous_actions=[True, True, True, False],
+                   use_ego_color=True, continuous_actions=[True, True, False, False],
                    car_labels=car_labels)
 
     obs = env.reset()
@@ -81,7 +81,7 @@ def player_vs_cars():
         restart = False
         while True:
             actions[1] = model_policy(obs[1], ppo_model_1m)
-            actions[2] = model_policy(obs[2], ppo_model_2m)
+            actions[2] = model_policy(obs[2], ppo_discrete_model_2m)
             actions[3] = model_policy(obs[3], dqn_model)
 
             obs, r, done, info = env.step(actions)
