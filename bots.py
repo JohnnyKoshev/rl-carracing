@@ -25,25 +25,25 @@ def model_policy(observation, model):
 
 def bots_only():
     NUM_CARS = 3
-    car_labels = ["PPO_1M", "PPO_2M", "DQN_1M"]
+    car_labels = ["PPO_1M", "PPO_Discrete_1M", "DQN_1M"]
 
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
         [0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0],
+        0,
         0,
     ]
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dqn_model = DQN.load("DQN_RL_1M", device=device)
     ppo_model_1m = PPO.load("PPO_RL_1M", device=device)
-    ppo_model_2m = PPO.load("PPO_RL_2M", device=device)
+    ppo_discrete_model_1m = PPO.load("PPO_Discrete_RL_1M", device=device)
 
     print("Model loaded")
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_random_direction=True,
-                   use_ego_color=True, continuous_actions=[True, True, False],
+                   use_ego_color=True, continuous_actions=[True, False, False],
                    car_labels=car_labels)
 
     obs = env.reset()
@@ -59,7 +59,7 @@ def bots_only():
 
         while True:
             actions[0] = model_policy(obs[0], ppo_model_1m)
-            actions[1] = model_policy(obs[1], ppo_model_2m)
+            actions[1] = model_policy(obs[1], ppo_discrete_model_1m)
             actions[2] = model_policy(obs[2], dqn_model)
 
             obs, r, done, info = env.step(actions)
