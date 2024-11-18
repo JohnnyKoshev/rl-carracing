@@ -26,13 +26,14 @@ def model_policy(observation, model):
 def bots_only():
     NUM_CARS = 3
     car_labels = ["PPO_1M", "PPO_Discrete_2M", "DQN_1M"]
-
     # actions = np.zeros((NUM_CARS, 3))
     actions = [
         [0.0, 0.0, 0.0],
         0,
         0,
     ]
+
+    continuous_actions = [True, False, False]
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     ppo_model_1m = PPO.load("PPO_RL_1M", device=device)
@@ -43,7 +44,7 @@ def bots_only():
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
                    use_random_direction=True,
-                   use_ego_color=True, continuous_actions=[True, False, False],
+                   use_ego_color=True, continuous_actions=continuous_actions,
                    car_labels=car_labels)
 
     obs = env.reset()

@@ -38,6 +38,8 @@ def player_vs_cars():
         0,
     ]
 
+    continuous_actions = [True, True, False, False]
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dqn_model = DQN.load("DQN_RL_1M", device=device)
     ppo_model_1m = PPO.load("PPO_RL_1M", device=device)
@@ -63,7 +65,7 @@ def player_vs_cars():
         if k == CAR_CONTROL_KEYS[0][3]: actions[0][2] = 0
 
     env = gym.make("MultiCarRacing-v0", num_agents=NUM_CARS, direction='CCW',
-                   use_ego_color=True, continuous_actions=[True, True, False, False],
+                   use_ego_color=True, continuous_actions=continuous_actions,
                    car_labels=car_labels)
 
     obs = env.reset()
