@@ -1,10 +1,21 @@
+import threading
+
 import numpy as np
 import gym
+import pygame
 import torch
 from pyglet.window import key
 import random
 
 from stable_baselines3 import DQN, PPO, SAC
+
+
+def play_audio():
+    pygame.mixer.init()  # Initialize the mixer for audio
+    pygame.mixer.music.load('car.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)  # Play the audio looped (-1 means infinite loop)
+
 
 try:
     gym.register(
@@ -49,6 +60,10 @@ def bots_only():
 
     obs = env.reset()
 
+    audio_thread_started = False
+    audio_thread = threading.Thread(target=play_audio)
+    audio_thread.daemon = True
+
     is_open = True
     stopped = False
 
@@ -65,6 +80,11 @@ def bots_only():
 
             obs, r, done, info = env.step(actions)
             total_reward += r
+
+            # Start the audio thread only once during each game loop
+            if not audio_thread_started:
+                audio_thread.start()
+                audio_thread_started = True  # Mark that the audio thread has been started
 
             if steps % 200 == 0:
                 print("\n\nStep " + str(steps))
