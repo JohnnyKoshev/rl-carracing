@@ -25,12 +25,23 @@ def run_with_retries(target, retries=10):
 
 def main_menu():
     pygame.init()
+    pygame.mixer.init()  # Initialize the mixer for audio playback
+
+    # Load and play background music
+    pygame.mixer.music.load("music.mp3")  # Replace with your music file path
+    pygame.mixer.music.set_volume(0.5)  # Set volume (0.0 to 1.0)
+    pygame.mixer.music.play(-1)  # Play the music in a loop (-1 for infinite looping)
+
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Car Racing")
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)
     title_font = pygame.font.Font(None, 48)
     footer_font = pygame.font.Font(None, 24)
+
+    # Load background image
+    background_image = pygame.image.load("background.jpg")  # Replace with your image path
+    background_image = pygame.transform.scale(background_image, (800, 600))
 
     title = "Car Racists"
     footer = "U2110292 Abdulaziz Zakirov, U2110289 Komiljon Yuldashev"
@@ -39,7 +50,7 @@ def main_menu():
     selected_item = 0
 
     while True:
-        screen.fill((0, 0, 0))  # Clear the screen with a black background
+        screen.blit(background_image, (0, 0))  # Draw the background image
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -98,4 +109,5 @@ if __name__ == "__main__":
     try:
         main_menu()
     except Exception as e:
+        pygame.mixer.music.stop()  # Stop music on exit
         exit(0)
