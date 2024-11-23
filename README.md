@@ -1,6 +1,6 @@
 # RL Car Racing
 
-![Gameplay Demo](visuals/gameplay.gif)
+<img src="visuals/gameplay.gif" alt="Gameplay Demo" style="width:100%; max-width:800px; display:block; margin:auto;">
 
 RL Car Racing is a Python-based simulation game that combines reinforcement learning (RL) models with interactive
 gameplay. Players can compete against RL-driven cars or watch RL models race against each other.
