@@ -44,7 +44,7 @@ def main_menu():
     play_background_music()
 
     screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Multi Car Racing")
+    pygame.display.set_caption("RL Car Racing")
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)
     title_font = pygame.font.Font(None, 48)
@@ -54,8 +54,8 @@ def main_menu():
     background_image = pygame.image.load("menu.png")  # Replace with your image path
     background_image = pygame.transform.scale(background_image, (800, 600))
 
-    title = "Multi Car Racing"
-    footer = "U2110292 Abdulaziz Zakirov, U2110289 Komiljon Yuldashev"
+    title = "RL Car Racing"
+    footer = "Abdulaziz Zakirov, Komiljon Yuldashev"
 
     menu_items = ["1. Player vs RL Models", "2. RL Models only"]
     selected_item = 0
